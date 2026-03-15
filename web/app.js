@@ -26,10 +26,25 @@ const conversation = document.getElementById('conversation');
 const messagesEl = document.getElementById('messages');
 const sendForm = document.getElementById('send-form');
 const messageInput = document.getElementById('message-input');
+const navChat = document.getElementById('nav-chat');
+const navDashboard = document.getElementById('nav-dashboard');
+const chatLayout = document.querySelector('.chat-layout');
+const dashboardScreen = document.getElementById('dashboard-screen');
+const dashboardError = document.getElementById('dashboard-error');
+const dashboardContent = document.getElementById('dashboard-content');
 
 function showScreen(screen) {
   loginScreen.style.display = screen === 'login' ? 'block' : 'none';
   chatScreen.style.display = screen === 'chat' ? 'block' : 'none';
+}
+
+function showView(view) {
+  const isChat = view === 'chat';
+  if (chatLayout) chatLayout.style.display = isChat ? 'flex' : 'none';
+  if (dashboardScreen) dashboardScreen.style.display = isChat ? 'none' : 'block';
+  navChat?.classList.toggle('active', isChat);
+  navDashboard?.classList.toggle('active', !isChat);
+  if (view === 'dashboard') loadDashboard();
 }
 
 function api(url, options = {}) {
@@ -44,7 +59,11 @@ function api(url, options = {}) {
 async function apiJson(url, options = {}) {
   const res = await api(url, options);
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.detail || res.statusText);
+  if (!res.ok) {
+    const e = new Error(data.detail || res.statusText);
+    e.status = res.status;
+    throw e;
+  }
   return data;
 }
 
@@ -57,7 +76,9 @@ function connectWebSocket() {
     if (data.type === 'message' && currentConv &&
         data.conversation_type === currentConv.type &&
         data.conversation_id === currentConv.id) {
-      appendMessage(data.message);
+      if (data.message.sender_username !== username) {
+        appendMessage(data.message);
+      }
     }
   };
   ws.onclose = () => setTimeout(connectWebSocket, 3000);
@@ -220,6 +241,169 @@ createRoomBtn.addEventListener('click', async () => {
     alert(err.message);
   }
 });
+
+navChat?.addEventListener('click', (e) => { e.preventDefault(); showView('chat'); });
+navDashboard?.addEventListener('click', (e) => { e.preventDefault(); showView('dashboard'); });
+
+async function loadDashboard() {
+  dashboardError.style.display = 'none';
+  dashboardContent.style.display = 'none';
+  try {
+    const [config, connections, users, rooms] = await Promise.all([
+      apiJson('/api/admin/config'),
+      apiJson('/api/admin/connections'),
+      apiJson('/api/admin/users'),
+      apiJson('/api/admin/rooms'),
+    ]);
+    dashboardError.style.display = 'none';
+    dashboardContent.style.display = 'block';
+    document.getElementById('dashboard-config').textContent = JSON.stringify(config, null, 2);
+    document.getElementById('dashboard-connections').textContent = `${connections.websocket} WebSocket connection(s)`;
+    document.getElementById('dashboard-users').innerHTML = users.length ? `
+      <table class="dashboard-table">
+        <thead><tr><th>ID</th><th>Username</th><th>Type</th><th>Default PW</th></tr></thead>
+        <tbody>${users.map(u => `
+          <tr>
+            <td>${escapeHtml(String(u.id))}</td>
+            <td>${escapeHtml(u.username)}</td>
+            <td>${u.is_bot ? 'Bot' : 'Human'}</td>
+            <td>${u.uses_default_password === true ? 'Yes' : u.uses_default_password === false ? 'No' : '—'}</td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    ` : '<p>No users yet.</p>';
+    const roomDetails = await Promise.all(rooms.map(r => apiJson(`/api/admin/rooms/${r.id}`).catch(() => null)));
+    document.getElementById('dashboard-rooms').innerHTML = rooms.length ? rooms.map((r, i) => {
+      const detail = roomDetails[i];
+      const members = detail?.members || [];
+      return `
+        <div class="room-card" data-room-id="${r.id}">
+          <div class="room-card-header">
+            <input type="text" class="room-name-input" value="${escapeHtml(r.name)}" data-room-id="${r.id}">
+            <button class="room-rename-btn" data-room-id="${r.id}">Rename</button>
+            <button class="room-delete-btn" data-room-id="${r.id}">Delete</button>
+          </div>
+          <div class="room-members">
+            <div class="room-members-list">${members.map(m => `
+              <span class="member-tag">${escapeHtml(m.username)} (${m.role})
+                ${m.role !== 'admin' ? `<button class="member-remove" data-room-id="${r.id}" data-username="${escapeHtml(m.username)}">×</button>` : ''}
+              </span>
+            `).join('')}</div>
+            <div class="room-add-member">
+              <select class="room-add-select" data-room-id="${r.id}">
+                <option value="">Add user...</option>
+                ${users.filter(u => !members.some(m => m.username === u.username)).map(u => `
+                  <option value="${escapeHtml(u.username)}">${escapeHtml(u.username)}</option>
+                `).join('')}
+              </select>
+              <button class="room-add-btn" data-room-id="${r.id}">Add</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('') : '<p>No rooms yet.</p>';
+
+    document.querySelectorAll('.room-rename-btn').forEach(btn => {
+      btn.addEventListener('click', () => renameRoom(parseInt(btn.dataset.roomId)));
+    });
+    document.querySelectorAll('.room-delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => deleteRoom(parseInt(btn.dataset.roomId)));
+    });
+    document.querySelectorAll('.room-add-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const roomId = parseInt(btn.dataset.roomId);
+        const select = document.querySelector(`.room-add-select[data-room-id="${roomId}"]`);
+        const username = select?.value;
+        if (username) addRoomMember(roomId, username);
+      });
+    });
+    document.querySelectorAll('.member-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        removeRoomMember(parseInt(btn.dataset.roomId), btn.dataset.username);
+      });
+    });
+    document.querySelectorAll('.room-name-input').forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') renameRoom(parseInt(input.dataset.roomId));
+      });
+    });
+  } catch (err) {
+    dashboardError.style.display = 'block';
+    dashboardError.textContent = (err.status === 403) ? 'Admin access required.' : (err.message || 'Failed to load dashboard.');
+  }
+}
+
+document.getElementById('create-user-btn')?.addEventListener('click', async () => {
+  const username = document.getElementById('new-user-username').value.trim();
+  const isBot = document.getElementById('new-user-is-bot').checked;
+  if (!username) { alert('Username required'); return; }
+  try {
+    const data = await apiJson('/api/admin/users', {
+      method: 'POST',
+      body: JSON.stringify({ username, is_bot: isBot }),
+    });
+    document.getElementById('new-user-username').value = '';
+    if (data.api_token) {
+      document.getElementById('api-token-value').textContent = data.api_token;
+      document.getElementById('api-token-modal').style.display = 'flex';
+    }
+    loadDashboard();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+document.getElementById('api-token-dismiss')?.addEventListener('click', () => {
+  document.getElementById('api-token-modal').style.display = 'none';
+});
+
+document.getElementById('admin-create-room-btn')?.addEventListener('click', async () => {
+  const name = document.getElementById('admin-new-room-name')?.value?.trim();
+  if (!name) { alert('Room name required'); return; }
+  try {
+    await apiJson('/api/admin/rooms', { method: 'POST', body: JSON.stringify({ name }) });
+    document.getElementById('admin-new-room-name').value = '';
+    loadDashboard();
+  } catch (err) { alert(err.message); }
+});
+
+async function renameRoom(roomId) {
+  const input = document.querySelector(`.room-name-input[data-room-id="${roomId}"]`);
+  const name = input?.value?.trim();
+  if (!name) return;
+  try {
+    await apiJson(`/api/admin/rooms/${roomId}`, { method: 'PUT', body: JSON.stringify({ name }) });
+    loadDashboard();
+  } catch (err) { alert(err.message); }
+}
+
+async function deleteRoom(roomId) {
+  if (!confirm('Delete this room and all its messages?')) return;
+  try {
+    await apiJson(`/api/admin/rooms/${roomId}`, { method: 'DELETE' });
+    loadDashboard();
+  } catch (err) { alert(err.message); }
+}
+
+async function addRoomMember(roomId, username) {
+  try {
+    await apiJson(`/api/admin/rooms/${roomId}/members`, {
+      method: 'PUT',
+      body: JSON.stringify({ add: [username] }),
+    });
+    loadDashboard();
+  } catch (err) { alert(err.message); }
+}
+
+async function removeRoomMember(roomId, username) {
+  try {
+    await apiJson(`/api/admin/rooms/${roomId}/members`, {
+      method: 'PUT',
+      body: JSON.stringify({ remove: [username] }),
+    });
+    loadDashboard();
+  } catch (err) { alert(err.message); }
+}
 
 if (token && username) {
   api('/api/dms').then(res => {

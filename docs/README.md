@@ -35,6 +35,8 @@ Conduit Chat is a self-hosted private chat server for family members and their A
 
 **Error responses:** JSON `{"detail": "message"}` with HTTP 4xx/5xx.
 
+**Dashboard:** Admin users access the dashboard via the web app nav (Chat | Dashboard). Create users, view rooms, config, and connections.
+
 ## Data Model Summary
 
 - **Users:** Human (username + password) or bot (username + api_token)

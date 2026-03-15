@@ -6,7 +6,9 @@ Conduit Chat supports two authentication modes: **human users** (username + pass
 
 ### Flow
 
-1. **Bootstrap (first run):** Call `POST /api/setup` with `{"username","password"}` to create the first admin user. No auth required. This endpoint is disabled once any user exists.
+1. **Bootstrap (first run):**
+   - **Auto:** Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the environment. If no users exist, the server creates the first admin on startup.
+   - **Manual:** Call `POST /api/setup` with `{"username","password"}` to create the first admin user. No auth required. This endpoint is disabled once any user exists.
 
 2. **Login:** Call `POST /api/auth/login` with `{"username","password"}` to receive a JWT:
    ```json

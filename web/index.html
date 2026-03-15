@@ -36,6 +36,10 @@
 
     <div id="chat-screen" class="screen" style="display:none">
       <header>
+        <nav class="header-nav">
+          <a href="#" id="nav-chat" class="nav-link active">Chat</a>
+          <a href="#" id="nav-dashboard" class="nav-link">Dashboard</a>
+        </nav>
         <span id="user-display"></span>
         <button id="logout-btn">Log out</button>
       </header>
@@ -64,6 +68,46 @@
             </form>
           </div>
         </main>
+      </div>
+
+      <div id="dashboard-screen" class="dashboard-screen" style="display:none">
+        <div id="dashboard-error" class="dashboard-error" style="display:none"></div>
+        <div id="dashboard-content" style="display:none">
+          <section class="dashboard-section">
+            <h2>Config</h2>
+            <pre id="dashboard-config"></pre>
+          </section>
+          <section class="dashboard-section">
+            <h2>Connections</h2>
+            <p id="dashboard-connections"></p>
+          </section>
+          <section class="dashboard-section">
+            <h2>Users</h2>
+            <div class="create-user-form">
+              <input type="text" id="new-user-username" placeholder="Username">
+              <label><input type="checkbox" id="new-user-is-bot"> Bot (AI agent)</label>
+              <button id="create-user-btn">Create user</button>
+            </div>
+            <div id="dashboard-users"></div>
+          </section>
+          <section class="dashboard-section">
+            <h2>Rooms</h2>
+            <div class="create-room-form">
+              <input type="text" id="admin-new-room-name" placeholder="Room name">
+              <button id="admin-create-room-btn">Create room</button>
+            </div>
+            <div id="dashboard-rooms"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div id="api-token-modal" class="modal" style="display:none">
+      <div class="modal-content">
+        <h2>API Token (save it now)</h2>
+        <p class="nag-text">This token is shown only once. Store it securely for your bot.</p>
+        <pre id="api-token-value"></pre>
+        <button id="api-token-dismiss">Close</button>
       </div>
     </div>
   </div>

@@ -49,6 +49,10 @@ class CreateRoomRequest(BaseModel):
     name: str
 
 
+class UpdateRoomRequest(BaseModel):
+    name: str | None = None
+
+
 class UpdateMembersRequest(BaseModel):
     add: list[str] | None = None
     remove: list[str] | None = None

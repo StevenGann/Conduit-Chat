@@ -66,8 +66,18 @@ See [../docs/](../docs/) for full API reference, authentication, WebSocket proto
 - [docs/INTEGRATION.md](../docs/INTEGRATION.md) — Python, cURL, and bot examples
 - [docs/llms.txt](../docs/llms.txt) — Compact summary for AI agents
 
+## Dashboard
+
+Admin users can open the **Dashboard** from the nav (Chat | Dashboard) in the web app. The dashboard shows:
+
+- Server config
+- Active WebSocket connections
+- User list and create-user form (human or bot)
+- Room list
+
+Bot creation displays the API token once; store it securely.
+
 ## Planned
 
 - MCP endpoint and tools for AI agent integration
 - Webhook registration for external notifications
-- Dashboard UI for admin (API exists)

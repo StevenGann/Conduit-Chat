@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     serve_web_app: bool = False
     web_app_path: str = "./static"
     admin_username: str | None = None  # Force this user as admin
+    admin_password: str | None = None  # If set with admin_username and no users exist, auto-create first admin
     origin: str = "*"
 
 

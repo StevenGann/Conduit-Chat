@@ -411,6 +411,82 @@ GET /api/admin/rooms
 
 ---
 
+### Get Room Details (Admin)
+
+```
+GET /api/admin/rooms/{room_id}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "id": 1,
+  "name": "general",
+  "created_at": "...",
+  "members": [{"id": 1, "username": "alice", "role": "admin"}, ...]
+}
+```
+
+---
+
+### Create Room (Admin)
+
+```
+POST /api/admin/rooms
+```
+
+**Request body:** `{"name": "general"}`
+
+**Response:** `200 OK`
+```json
+{"id": 1, "name": "general"}
+```
+
+---
+
+### Update Room (Admin)
+
+```
+PUT /api/admin/rooms/{room_id}
+```
+
+**Request body:** `{"name": "new-name"}`
+
+**Response:** `200 OK`
+```json
+{"ok": true}
+```
+
+---
+
+### Update Room Members (Admin)
+
+```
+PUT /api/admin/rooms/{room_id}/members
+```
+
+**Request body:** `{"add": ["user1"], "remove": ["user2"]}`
+
+**Response:** `200 OK`
+```json
+{"ok": true}
+```
+
+---
+
+### Delete Room (Admin)
+
+```
+DELETE /api/admin/rooms/{room_id}
+```
+
+**Response:** `200 OK`
+```json
+{"ok": true}
+```
+
+---
+
 ### List Users
 
 ```

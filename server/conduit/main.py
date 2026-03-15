@@ -14,10 +14,27 @@ from .websocket import manager as ws_manager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    from .auth import hash_password
+
     settings = get_settings()
     Path(settings.database_path).parent.mkdir(parents=True, exist_ok=True)
     conn = await aiosqlite.connect(settings.database_path)
     await init_db(conn)
+
+    # Auto-create first admin if ADMIN_USERNAME and ADMIN_PASSWORD are set
+    if settings.admin_username and settings.admin_password and settings.secret_key:
+        cursor = await conn.execute("SELECT COUNT(*) FROM users")
+        row = await cursor.fetchone()
+        await cursor.close()
+        if row[0] == 0:
+            password_hash = hash_password(settings.admin_password)
+            await conn.execute(
+                "INSERT INTO users (username, password_hash, is_bot, uses_default_password) "
+                "VALUES (?, ?, 0, 0)",
+                (settings.admin_username, password_hash),
+            )
+            await conn.commit()
+
     await conn.close()
     yield
 
