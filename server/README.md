@@ -11,6 +11,7 @@ pip install -r requirements.txt
 # Create .env or set env vars
 export SECRET_KEY="your-secret-key-min-32-chars"
 export DEFAULT_PASSWORD="default-password-for-new-users"
+# Optional: ADMIN_USERNAME and ADMIN_PASSWORD for auto-bootstrap (creates first admin on startup)
 
 # Run server
 uvicorn conduit.main:app --reload --port 8080
@@ -25,8 +26,9 @@ uvicorn conduit.main:app --reload --port 8080
 ## First-Time Setup
 
 1. Start the server
-2. POST to `/api/setup` with `{"username": "admin", "password": "your-password"}` to create the first admin user
-3. Log in at the web app or via `POST /api/auth/login`
+2. **Option A (auto):** Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in env; server creates first admin on startup
+3. **Option B (manual):** POST to `/api/setup` with `{"username": "admin", "password": "your-password"}` when no users exist
+4. Log in at the web app or via `POST /api/auth/login`
 
 ## Docker
 
@@ -54,7 +56,7 @@ SECRET_KEY=xxx DEFAULT_PASSWORD=yyy docker-compose -f server/docker-compose.yml 
 - `GET /api/rooms/{id}/messages` - Get messages
 - `POST /api/rooms/{id}/messages` - Send message
 - `WS /ws?token=...` - WebSocket for real-time updates
-- `GET /api/admin/*` - Admin endpoints (config, users, rooms, connections)
+- Admin: `GET/POST/PUT/DELETE /api/admin/rooms`, `GET/POST /api/admin/users`, `GET /api/admin/config`, `GET /api/admin/connections`
 
 ## Documentation
 
@@ -73,7 +75,7 @@ Admin users can open the **Dashboard** from the nav (Chat | Dashboard) in the we
 - Server config
 - Active WebSocket connections
 - User list and create-user form (human or bot)
-- Room list
+- Room list with create, rename, delete, and add/remove members
 
 Bot creation displays the API token once; store it securely.
 

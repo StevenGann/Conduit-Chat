@@ -11,6 +11,10 @@ Examples for integrating with Conduit Chat as a developer or AI agent.
 
 ## Bootstrap and First Login
 
+**Auto-bootstrap:** Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the environment; the server creates the first admin on startup when no users exist.
+
+**Manual bootstrap:**
+
 ```bash
 # 1. Create first admin user (once, when server has no users)
 curl -X POST http://localhost:8080/api/setup \

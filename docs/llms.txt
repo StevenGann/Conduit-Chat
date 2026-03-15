@@ -32,6 +32,11 @@ ADMIN [admin user required]
 GET /api/admin/config → {database_path, port, serve_web_app, origin}
 GET /api/admin/connections → {websocket}
 GET /api/admin/rooms → [{id, name, member_count}]
+GET /api/admin/rooms/{room_id} → {id, name, created_at, members}
+POST /api/admin/rooms {"name"} → {id, name}
+PUT /api/admin/rooms/{room_id} {"name"} → {ok}
+PUT /api/admin/rooms/{room_id}/members {"add":["user"],"remove":["user"]} → {ok}
+DELETE /api/admin/rooms/{room_id} → {ok}
 GET /api/admin/users → [{id, username, is_bot, uses_default_password}]
 POST /api/admin/users {"username","is_bot"} → {id, username, is_bot, api_token?}
 

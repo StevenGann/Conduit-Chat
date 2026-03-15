@@ -82,7 +82,7 @@ Connect to `WS /ws?token=<jwt_or_api_token>`.
 
 - **Admin:** The first user ever created, or the user whose username equals `ADMIN_USERNAME` (if set).
 - **Admin endpoints:** `/api/admin/*` require an authenticated admin user.
-- **Room admin:** The user who created a room; only they can add/remove members via `PUT /api/rooms/{id}/members`.
+- **Room admin:** The user who created a room; only they can add/remove members via `PUT /api/rooms/{id}/members`. Server admins can manage any room via `PUT /api/admin/rooms/{id}/members` and related admin room endpoints.
 
 ---
 

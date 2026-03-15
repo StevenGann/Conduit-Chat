@@ -43,6 +43,8 @@ environment:
   - DATABASE_PATH=/app/data/conduit.db
   - SECRET_KEY=${SECRET_KEY}
   - DEFAULT_PASSWORD=${DEFAULT_PASSWORD}
+  - ADMIN_USERNAME=${ADMIN_USERNAME}
+  - ADMIN_PASSWORD=${ADMIN_PASSWORD}
   - SERVE_WEB_APP=true
   - WEB_APP_PATH=/app/static
 ```

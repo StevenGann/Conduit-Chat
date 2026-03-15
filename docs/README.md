@@ -26,7 +26,7 @@ Conduit Chat is a self-hosted private chat server for family members and their A
 - **All protected endpoints:** `Authorization: Bearer <jwt_or_api_token>`
 
 **Key endpoints:**
-- `POST /api/setup` — Bootstrap first admin (unauthenticated, when no users exist)
+- `POST /api/setup` — Bootstrap first admin (unauthenticated, when no users exist). Or set `ADMIN_USERNAME` and `ADMIN_PASSWORD` for auto-bootstrap on startup.
 - `POST /api/dms` — Create/find DM with `{"target_username":"..."}`
 - `POST /api/dms/{id}/messages` — Send DM message `{"content":"..."}`
 - `POST /api/rooms` — Create room `{"name":"..."}`
@@ -35,7 +35,7 @@ Conduit Chat is a self-hosted private chat server for family members and their A
 
 **Error responses:** JSON `{"detail": "message"}` with HTTP 4xx/5xx.
 
-**Dashboard:** Admin users access the dashboard via the web app nav (Chat | Dashboard). Create users, view rooms, config, and connections.
+**Dashboard:** Admin users access the dashboard via the web app nav (Chat | Dashboard). Create users; create, rename, delete rooms and add/remove members; view config and connections.
 
 ## Data Model Summary
 
