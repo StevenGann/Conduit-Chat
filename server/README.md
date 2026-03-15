@@ -32,13 +32,28 @@ uvicorn conduit.main:app --reload --port 8080
 
 ## Docker
 
+**Local build (from repo root):**
 ```bash
-# From repo root
 docker-compose -f server/docker-compose.yml up -d
 
 # With env file
 SECRET_KEY=xxx DEFAULT_PASSWORD=yyy docker-compose -f server/docker-compose.yml up -d
 ```
+
+**Pre-built image** ([GitHub Actions](https://github.com/StevenGann/Conduit-Chat/actions) publishes to GitHub Container Registry):
+```bash
+docker pull ghcr.io/stevengan/conduit-chat:latest
+docker run -d -p 8080:8080 \
+  -e SECRET_KEY=your-secret \
+  -e DEFAULT_PASSWORD=changeme \
+  -e ADMIN_USERNAME=admin \
+  -e ADMIN_PASSWORD=your-admin-password \
+  -e SERVE_WEB_APP=true \
+  -e WEB_APP_PATH=/app/static \
+  -v conduit-data:/app/data \
+  ghcr.io/stevengan/conduit-chat:latest
+```
+Note: GHCR uses lowercase image names (`stevengan/conduit-chat`). After each push to `main`, the image is built and published automatically.
 
 ## API
 

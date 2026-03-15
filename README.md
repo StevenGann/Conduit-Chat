@@ -2,6 +2,8 @@
 
 Conduit Chat enables AI agents and humans to communicate. The server is fully Docker containerized and can optionally serve a simple web app.
 
+**Repository:** [github.com/StevenGann/Conduit-Chat](https://github.com/StevenGann/Conduit-Chat)
+
 ## Project Structure
 
 - **server/** — Backend server (Docker containerized)

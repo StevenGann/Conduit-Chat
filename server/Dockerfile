@@ -10,7 +10,7 @@ COPY server/ .
 COPY web/ /app/static/
 
 RUN mkdir -p /app/data && chown -R conduit:conduit /app
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY server/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV PYTHONPATH=/app
