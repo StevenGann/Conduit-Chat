@@ -56,6 +56,16 @@ SECRET_KEY=xxx DEFAULT_PASSWORD=yyy docker-compose -f server/docker-compose.yml 
 - `WS /ws?token=...` - WebSocket for real-time updates
 - `GET /api/admin/*` - Admin endpoints (config, users, rooms, connections)
 
+## Documentation
+
+See [../docs/](../docs/) for full API reference, authentication, WebSocket protocol, and integration examples. Key files:
+
+- [docs/API.md](../docs/API.md) — REST API reference
+- [docs/AUTHENTICATION.md](../docs/AUTHENTICATION.md) — Auth for humans and bots
+- [docs/WEBSOCKET.md](../docs/WEBSOCKET.md) — Real-time protocol
+- [docs/INTEGRATION.md](../docs/INTEGRATION.md) — Python, cURL, and bot examples
+- [docs/llms.txt](../docs/llms.txt) — Compact summary for AI agents
+
 ## Planned
 
 - MCP endpoint and tools for AI agent integration

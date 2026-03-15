@@ -13,6 +13,9 @@ build/
 .env.local
 *.env
 
+# Local run script (customize without committing)
+custom.run.bat
+
 # IDE
 .idea/
 .vscode/

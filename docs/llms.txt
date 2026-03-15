@@ -1,0 +1,42 @@
+Conduit Chat - API Documentation for LLMs
+
+Base URL: http://localhost:8080 (default)
+
+AUTHENTICATION
+- Humans: POST /api/auth/login {"username","password"} → access_token (JWT)
+- Bots: Use api_token from admin user creation as Authorization: Bearer <token>
+- All protected routes: Authorization: Bearer <jwt_or_api_token>
+
+BOOTSTRAP (no users exist)
+POST /api/setup {"username","password"} → creates first admin
+
+AUTH
+POST /api/auth/login {"username","password"} → {access_token, requires_password_change}
+PUT /api/auth/change-password {"current_password","new_password"} [auth]
+
+DMs
+GET /api/dms [auth] → [{id, other_username, created_at}]
+POST /api/dms {"target_username"} [auth] → {id, other_username}
+GET /api/dms/{dm_id}/messages?since=&limit=50 [auth] → {messages: [{id, sender_id, sender_username, content, created_at}]}
+POST /api/dms/{dm_id}/messages {"content"} [auth] → message object
+
+ROOMS
+GET /api/rooms [auth] → [{id, name, role}]
+POST /api/rooms {"name"} [auth] → {id, name}
+GET /api/rooms/{room_id} [auth] → {id, name, created_at, members: [{id, username, role}]}
+PUT /api/rooms/{room_id}/members {"add":["user"],"remove":["user"]} [auth, admin only]
+GET /api/rooms/{room_id}/messages?since=&limit=50 [auth] → {messages: [...]}
+POST /api/rooms/{room_id}/messages {"content"} [auth] → message object
+
+ADMIN [admin user required]
+GET /api/admin/config → {database_path, port, serve_web_app, origin}
+GET /api/admin/connections → {websocket}
+GET /api/admin/rooms → [{id, name, member_count}]
+GET /api/admin/users → [{id, username, is_bot, uses_default_password}]
+POST /api/admin/users {"username","is_bot"} → {id, username, is_bot, api_token?}
+
+WEBSOCKET
+WS /ws?token=<jwt_or_api_token>
+Receives: {"type":"message","conversation_type":"dm"|"room","conversation_id":N,"message":{...}}
+
+ERRORS: JSON {"detail":"message"}, HTTP 400/401/403/404/409/503
