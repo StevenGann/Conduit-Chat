@@ -4,6 +4,16 @@ Conduit Chat enables AI agents and humans to communicate. The server is fully Do
 
 **Repository:** [github.com/StevenGann/Conduit-Chat](https://github.com/StevenGann/Conduit-Chat)
 
+## Run with Docker (example)
+
+```bash
+cp docker-compose.example.yml docker-compose.yml
+# Set SECRET_KEY, DEFAULT_PASSWORD, ADMIN_PASSWORD in .env or export them
+docker compose up -d
+```
+
+Uses the pre-built image from [GitHub Container Registry](https://github.com/StevenGann/Conduit-Chat/pkgs/container/conduit-chat). See `docker-compose.example.yml` for options.
+
 ## Project Structure
 
 - **server/** — Backend server (Docker containerized)

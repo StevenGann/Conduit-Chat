@@ -1,0 +1,30 @@
+# Example Docker Compose for Conduit Chat
+# Copy to docker-compose.yml and set variables in .env or the environment.
+#
+# Quick start:
+#   cp docker-compose.example.yml docker-compose.yml
+#   # Edit docker-compose.yml or create .env with SECRET_KEY, DEFAULT_PASSWORD, etc.
+#   docker compose up -d
+#
+# Image is published by GitHub Actions: https://github.com/StevenGann/Conduit-Chat/actions
+
+services:
+  conduit:
+    image: ghcr.io/stevengan/conduit-chat:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_PATH=/app/data/conduit.db
+      - SECRET_KEY=${SECRET_KEY}
+      - DEFAULT_PASSWORD=${DEFAULT_PASSWORD}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - SERVE_WEB_APP=true
+      - WEB_APP_PATH=/app/static
+      - ORIGIN=${ORIGIN:-*}
+    volumes:
+      - conduit-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  conduit-data:
